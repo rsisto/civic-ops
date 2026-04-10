@@ -1,0 +1,19 @@
+{
+  "name": "civic-ops",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "src/backend",
+    "src/frontend"
+  ],
+  "overrides": {
+    "write-file-atomic": "^3.0.3"
+  },
+  "scripts": {
+    "build": "npm run build --workspace=src/backend && npm run build --workspace=src/frontend",
+    "test": "npm run test --workspace=src/backend",
+    "test:all": "npm run test --workspace=src/backend && npm run test --workspace=src/frontend",
+    "typecheck": "npm run typecheck --workspace=src/backend && npm run typecheck --workspace=src/frontend",
+    "lint": "npm run lint --workspace=src/backend && npm run lint --workspace=src/frontend"
+  }
+}

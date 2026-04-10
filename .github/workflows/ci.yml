@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  backend:
+    name: Backend — lint · typecheck · test · build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --workspace=src/backend
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        working-directory: .
+
+      - name: Lint
+        run: npm run lint --workspace=src/backend
+
+      - name: Typecheck
+        run: npm run typecheck --workspace=src/backend
+
+      - name: Test
+        run: npm run test --workspace=src/backend
+        env:
+          NODE_ENV: test
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://test:test@localhost:5432/civic_ops_test' }}
+          LOG_LEVEL: silent
+
+      - name: Build
+        run: npm run build --workspace=src/backend
+
+  frontend:
+    name: Frontend — lint · typecheck · build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --workspace=src/frontend
+
+      - name: Lint
+        run: npm run lint --workspace=src/frontend
+
+      - name: Typecheck
+        run: npm run typecheck --workspace=src/frontend
+
+      - name: Build
+        run: npm run build --workspace=src/frontend
