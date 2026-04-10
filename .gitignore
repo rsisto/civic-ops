@@ -1,0 +1,29 @@
+# Secrets — never committed
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# HIVE — .hive/ is intentionally tracked (whole team shares the AI layer).
+# Client delivery strips it via scripts/deliver.sh — do NOT gitignore here.
+# Only exclude active session state (volatile, meaningless outside the session):
+.hive/sessions/
+
+# Generated outputs
+*.pdf
+*.docx
+
+# Node
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db

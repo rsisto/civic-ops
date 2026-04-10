@@ -1,0 +1,31 @@
+---
+description: HIVE framework rules — applied to all files in this project
+globs:
+alwaysApply: true
+---
+
+# HIVE Development Rules
+
+This project uses **HIVE** (Harkos Intelligent Virtual Engine).
+Read `AGENTS.md` at the project root for the full agent protocol.
+
+## Non-negotiable rules (always apply)
+
+- **TDD first**: tests before implementation. No exceptions.
+- **English only**: all code, comments, commits, docs, ticket text.
+- **Architecture**: follow the layer rules defined in `.hive/standards/backend.mdc` (stack-specific).
+- **No `any` type**: use `unknown` and narrow, or define the type.
+- **No untyped money**: all monetary values use `Decimal`, never `Float`.
+- **Time in minutes**: store as `Int` minutes. Convert to HH:MM only in UI.
+- **Soft delete**: never hard-delete business entities. Use `deletedAt`.
+- **Audit trail**: every mutation on critical entities writes to `AuditLog`.
+- **Functions ≤ 20 lines**, params ≤ 3, nesting ≤ 2 levels.
+- **No debug logs in commits**: remove all `console.log` before committing.
+
+## Context loading (token-efficient)
+
+Load only what you need for the current task.
+The specific files to load per task are defined in `.hive/STACK.md` → Context Loading section.
+
+General rule: load only the agent for the current command + the standard for the current area.
+Do **not** load all agents and all standards for every task.
