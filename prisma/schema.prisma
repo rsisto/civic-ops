@@ -1,0 +1,102 @@
+// civic-ops — Prisma schema (Sprint 1)
+// Models: User, Workspace, WorkspaceMember, Meeting, MeetingNote, MeetingSummary
+// Sprint 2 additions: Commitment, CommitmentUpdate, AuditLog
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Identity & Access ─────────────────────────────────────────────────────────
+
+model User {
+  id           String            @id @default(cuid())
+  email        String            @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  memberships  WorkspaceMember[]
+
+  @@map("users")
+}
+
+model Workspace {
+  id        String            @id @default(cuid())
+  name      String
+  slug      String            @unique
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  members   WorkspaceMember[]
+  meetings  Meeting[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        Role      @default(VIEWER)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+enum Role {
+  ADMIN
+  COORDINATOR
+  ADVISOR
+  VIEWER
+}
+
+// ── Meeting Intelligence ──────────────────────────────────────────────────────
+
+model Meeting {
+  id           String           @id @default(cuid())
+  workspaceId  String
+  title        String
+  date         DateTime
+  participants String[]
+  topics       String[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  workspace    Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  notes        MeetingNote[]
+  summaries    MeetingSummary[]
+
+  @@index([workspaceId])
+  @@index([workspaceId, date])
+  @@map("meetings")
+}
+
+model MeetingNote {
+  id        String   @id @default(cuid())
+  meetingId String
+  content   String
+  createdAt DateTime @default(now())
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+  @@map("meeting_notes")
+}
+
+model MeetingSummary {
+  id          String   @id @default(cuid())
+  meetingId   String
+  content     String
+  triggeredBy String   // userId — plain string; FK enforced at application layer
+  createdAt   DateTime @default(now())
+  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+  @@map("meeting_summaries")
+}
