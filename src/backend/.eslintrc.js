@@ -34,4 +34,13 @@ module.exports = {
     es2022: true,
   },
   ignorePatterns: ['dist/', 'node_modules/', 'jest.config.ts'],
+  overrides: [
+    {
+      files: ['**/__tests__/**/*.ts', '**/*.test.ts'],
+      rules: {
+        '@typescript-eslint/unbound-method': 'off',
+        '@typescript-eslint/explicit-function-return-type': 'off',
+      },
+    },
+  ],
 };
